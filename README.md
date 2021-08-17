@@ -2,7 +2,10 @@
 
 <!---
 
+Setup for doctests
 >>> import experimentdb
+>>> from experimentdb.config import config_defaults
+>>> config_defaults['database'] = 'sqlite+pysqlite:///:memory:'
 
 --->
 
