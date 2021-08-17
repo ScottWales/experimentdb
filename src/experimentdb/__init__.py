@@ -1,4 +1,4 @@
-class ExperimentDB():
+class ExperimentDB:
     def experiments(*args, **kwargs):
         pass
 
