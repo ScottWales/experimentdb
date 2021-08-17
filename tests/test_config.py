@@ -1,4 +1,4 @@
-from experimentdb.config import *
+from experimentdb.config import read_config, config_defaults, config_schema
 import jsonschema
 import os
 import pytest

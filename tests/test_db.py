@@ -1,4 +1,4 @@
-from experimentdb.db import *
+from experimentdb.db import metadata, experiment
 
 import pytest
 import sqlalchemy as sqa
