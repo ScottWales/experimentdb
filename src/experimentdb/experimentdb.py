@@ -1,5 +1,6 @@
 from .config import read_config
 from .db import connect
+from .experiment import experiment_factory
 
 import glob
 
