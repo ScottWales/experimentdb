@@ -1,14 +1,21 @@
 from .config import read_config
 from .db import connect
 
+import glob
+
 
 class ExperimentDB:
     def __init__(self, config=None):
         self.config = read_config(config)
         self.db = connect(self.config)
 
-    def scan(self, paths=None):
-        pass
+    def scan_all(self):
+        for p in self.config["scan paths"]:
+            self.scan(p["type"], p["path"])
+
+    def scan(self, type, path):
+        for p in glob.glob(path):
+            exp = experiment_factory(type, p)
 
     def experiments(self, *args, **kwargs):
         pass
