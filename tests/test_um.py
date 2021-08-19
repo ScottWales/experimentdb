@@ -1,4 +1,8 @@
-from experimentdb.experiment.um import UMRose
+try:
+    from experimentdb.experiment.um import UMRose
+except ImportError:
+    pass
+
 import os
 import pytest
 

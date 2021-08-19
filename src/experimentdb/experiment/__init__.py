@@ -1,7 +1,11 @@
 from .base import Experiment
 
 # Import the subclasses so they're loaded
-from . import accesscm, um
+try:
+    # Can only support UM if mule and iris are installed
+    from . import accesscm, um
+except ImportError:
+    pass
 
 
 def all_subclasses(cls):
