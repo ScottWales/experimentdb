@@ -8,7 +8,7 @@ import pytest
 
 
 @pytest.mark.skipif(
-    not os.environ["HOSTNAME"].endswith("nci.org.au"), reason="Only at NCI"
+    not os.environ.get("HOSTNAME", "").endswith("nci.org.au"), reason="Only at NCI"
 )
 def test_um_find_files():
     exp = UMRose("/scratch/w35/saw562/cylc-run/u-cg447")
@@ -21,7 +21,7 @@ def test_um_find_files():
 
 
 @pytest.mark.skipif(
-    not os.environ["HOSTNAME"].endswith("nci.org.au"), reason="Only at NCI"
+    not os.environ.get("HOSTNAME", "").endswith("nci.org.au"), reason="Only at NCI"
 )
 def test_um_identify_streams():
     exp = UMRose("/scratch/w35/saw562/cylc-run/u-cg447")
@@ -39,7 +39,7 @@ def test_um_identify_streams():
 
 
 @pytest.mark.skipif(
-    not os.environ["HOSTNAME"].endswith("nci.org.au"), reason="Only at NCI"
+    not os.environ.get("HOSTNAME", "").endswith("nci.org.au"), reason="Only at NCI"
 )
 def test_um_find_variables():
     exp = UMRose("/scratch/w35/saw562/cylc-run/u-ce355")

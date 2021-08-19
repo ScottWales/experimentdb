@@ -1,8 +1,6 @@
 from .base import Experiment
 
 import os
-import mule
-import iris
 
 
 class UMRose(Experiment):
@@ -12,6 +10,8 @@ class UMRose(Experiment):
         """
         Finds UM format files in a Rose run
         """
+        import mule
+
         os.environ["UMDIR"] = "/g/data/access/projects/access/umdir"
         rel_path = "share/data/History_Data"
         path = os.path.join(self.path, rel_path)
@@ -48,6 +48,8 @@ class UMRose(Experiment):
         Since all files in a stream share the same variable, this only needs to
         be run once per stream
         """
+        import iris
+
         cubes = iris.load(os.path.join(self.path, file))
 
         results = [str(c.attributes["STASH"]) for c in cubes]
