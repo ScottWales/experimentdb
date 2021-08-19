@@ -34,4 +34,5 @@ jobs:
           black --check .
       - name: Test with pytest
         run: |
+          export PY_IGNORE_IMPORTMISMATCH=1
           pytest
