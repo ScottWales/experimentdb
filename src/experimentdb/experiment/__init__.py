@@ -1,5 +1,6 @@
 from .base import Experiment
 
+
 # Import the subclasses so they're loaded
 from . import accesscm, um
 
@@ -22,5 +23,7 @@ def experiment_factory(type: str, path: str) -> Experiment:
     # Each Experiment subclass has the type it's associated with as the parameter
     # 'type'. If it's an abstract class the type should be None
     types = {e.type: e for e in all_subclasses(Experiment) if e.type is not None}
+    # types[Experiment.type] = Experiment
+    print(types)
 
     return types[type](path)

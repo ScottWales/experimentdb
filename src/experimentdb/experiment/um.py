@@ -6,6 +6,9 @@ import os
 class UMRose(Experiment):
     type = "um-rose"
 
+    def __init__(self, path):
+        super().__init__(path)
+
     def find_files(self):
         """
         Finds UM format files in a Rose run

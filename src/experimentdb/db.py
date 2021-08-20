@@ -38,7 +38,7 @@ experiment = sqa.Table(
     sqa.Column("id", sqa.Integer, primary_key=True),
     sqa.Column("name", sqa.String, nullable=False),
     sqa.Column("path", sqa.Integer, nullable=False),
-    sqa.Column("type", sqa.String, nullable=False),
+    sqa.Column("type_id", sqa.String, nullable=False),
 )
 
 """

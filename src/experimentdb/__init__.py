@@ -1,1 +1,3 @@
-from .experimentdb import ExperimentDB
+from experimentdb.experimentdb import ExperimentDB
+
+import experimentdb.model
