@@ -39,6 +39,7 @@ experiment = sqa.Table(
     sqa.Column("name", sqa.String, nullable=False),
     sqa.Column("path", sqa.Integer, nullable=False),
     sqa.Column("type_id", sqa.String, nullable=False),
+    sqa.UniqueConstraint("type_id", "path"),
 )
 
 """
@@ -57,6 +58,7 @@ stream = sqa.Table(
     sqa.Column("name", sqa.String),
     sqa.Column("time_units", sqa.String),
     sqa.Column("calendar", sqa.String),
+    sqa.UniqueConstraint("experiment_id", "name"),
 )
 
 """
@@ -73,6 +75,7 @@ file = sqa.Table(
     sqa.Column("start_date", sqa.Float),
     sqa.Column("end_date", sqa.Float),
     sqa.Column("type_id", sqa.String, nullable=False),
+    sqa.UniqueConstraint("stream_id", "relative_path"),
 )
 
 """
