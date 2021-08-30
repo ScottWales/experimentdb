@@ -30,3 +30,9 @@ class Experiment:
         Group the listed files into streams containing similar variables
         """
         return {}
+
+    def update(self):
+        """
+        Update the experiment with the latest filesystem state
+        """
+        pass

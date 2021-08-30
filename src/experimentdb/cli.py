@@ -28,6 +28,7 @@ class CLIFunction:
     def top_call(self, args):
         if args.debug:
             logging.basicConfig(level=logging.DEBUG)
+            logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
         expdb = ExperimentDB(args.config)
         self.call(expdb, args)
@@ -70,6 +71,26 @@ class Scan(CLIFunction):
                 expdb.scan(args.type, p)
         else:
             expdb.scan_all()
+
+
+class List(CLIFunction):
+    """
+    List known experiments
+    """
+
+    name = "list"
+    help = "list known experiments"
+
+    def setup_parser(self, parser):
+        expt_types = sorted(
+            [e.type for e in all_subclasses(Experiment) if e.type is not None]
+        )
+        parser.add_argument(
+            "--type", default="generic", help="experiment type", choices=expt_types
+        )
+
+    def call(self, expdb, args):
+        print(expdb.experiments())
 
 
 class ShowConfig(CLIFunction):
