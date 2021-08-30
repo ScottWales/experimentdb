@@ -53,7 +53,8 @@ stream = sqa.Table(
     "stream",
     metadata,
     sqa.Column("id", sqa.Integer, primary_key=True),
-    sqa.Column("experiment_id", sqa.Integer),
+    sqa.Column("experiment_id", sqa.Integer, sqa.ForeignKey("experiment.id")),
+    sqa.Column("name", sqa.String),
     sqa.Column("time_units", sqa.String),
     sqa.Column("calendar", sqa.String),
 )
@@ -67,10 +68,11 @@ file = sqa.Table(
     "file",
     metadata,
     sqa.Column("id", sqa.Integer, primary_key=True),
-    sqa.Column("stream_id", sqa.Integer),
-    sqa.Column("relative_path", sqa.String),
+    sqa.Column("stream_id", sqa.Integer, sqa.ForeignKey("stream.id")),
+    sqa.Column("relative_path", sqa.String, nullable=False),
     sqa.Column("start_date", sqa.Float),
     sqa.Column("end_date", sqa.Float),
+    sqa.Column("type_id", sqa.String, nullable=False),
 )
 
 """
@@ -83,7 +85,7 @@ variable = sqa.Table(
     "variable",
     metadata,
     sqa.Column("id", sqa.Integer, primary_key=True),
-    sqa.Column("stream_id", sqa.Integer),
+    sqa.Column("stream_id", sqa.Integer, sqa.ForeignKey("stream.id")),
     sqa.Column("name", sqa.String, nullable=False, index=True),
     sqa.Column("standard_name", sqa.String, index=True),
     sqa.Column("method", sqa.String),

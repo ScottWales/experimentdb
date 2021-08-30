@@ -1,6 +1,10 @@
 from .base import Experiment
+from ..file import File, UMFile
+from ..stream import Stream
 
 import os
+
+import typing as T
 
 
 class UMRose(Experiment):
@@ -9,7 +13,7 @@ class UMRose(Experiment):
     def __init__(self, path):
         super().__init__(path)
 
-    def find_files(self):
+    def find_files(self) -> T.Iterator[File]:
         """
         Finds UM format files in a Rose run
         """
@@ -23,26 +27,25 @@ class UMRose(Experiment):
             for f in files:
                 p = os.path.join(root, f)
                 try:
-                    mule.load_umfile(p)
-                    yield os.path.relpath(p, self.path)
+                    yield UMFile(p, self)
                 except ValueError:
                     # Not a UM file
                     continue
 
-    def identify_streams(self, files):
+    def identify_streams(self, files) -> T.Dict[str, Stream]:
         """
         Group files into streams with the same variables
         """
-        streams = {}
+        streams: T.Dict[str, T.List[File]] = {}
 
         for f in files:
-            s = os.path.basename(f)[:9]
+            s = os.path.basename(f.relative_path)[:9]
             if s in streams:
                 streams[s].append(f)
             else:
                 streams[s] = [f]
 
-        return streams
+        return {k: Stream(k, v) for k, v in streams.items()}
 
     def find_variables(self, file):
         """

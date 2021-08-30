@@ -1,18 +1,8 @@
 from .base import Experiment
-
+from ...utils import all_subclasses
 
 # Import the subclasses so they're loaded
-from . import accesscm, um
-
-
-def all_subclasses(cls):
-    """
-    Recursively  list all subclasses of a given class
-    """
-    # https://stackoverflow.com/a/3862957
-    return set(cls.__subclasses__()).union(
-        [s for c in cls.__subclasses__() for s in all_subclasses(c)]
-    )
+from . import accesscm, um, generic
 
 
 def experiment_factory(type: str, path: str) -> Experiment:

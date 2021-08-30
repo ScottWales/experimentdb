@@ -10,7 +10,7 @@ def test_experiment(conn):
 
     r = conn.execute(
         sqa.insert(experiment).values(
-            name="u-ab123", path="/scratch/foo", type="um-rose"
+            name="u-ab123", path="/scratch/foo", type_id="um-rose"
         )
     )
 
