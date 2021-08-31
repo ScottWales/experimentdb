@@ -34,7 +34,7 @@ required: [database, scan paths]
 
 def read_config(path=None):
     if path is None:
-        path = "~/.config/experimentdb.yaml"
+        path = os.path.expanduser("~/.config/experimentdb.yaml")
 
     try:
         with open(path) as f:

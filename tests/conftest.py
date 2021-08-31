@@ -7,7 +7,7 @@ import sqlalchemy.orm
 
 @pytest.fixture(scope="session")
 def db():
-    engine = sqa.create_engine("sqlite+pysqlite:///:memory:")
+    engine = sqa.create_engine("sqlite+pysqlite:///:memory:", echo=False)
     metadata.create_all(engine)
 
     with engine.connect() as c:

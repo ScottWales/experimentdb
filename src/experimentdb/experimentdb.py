@@ -6,6 +6,8 @@ from . import db
 
 import glob
 import pandas
+import logging
+import os
 
 
 class ExperimentDB:
@@ -19,15 +21,19 @@ class ExperimentDB:
             self.scan(p["type"], p["path"])
 
     def scan(self, type, path):
-        for p in glob.glob(path):
+        for p in glob.glob(os.path.expanduser(path)):
             try:
+                logging.debug("scanning path %s", p)
                 exp = (
                     self.session.query(Experiment).filter_by(type_id=type, path=p).one()
                 )
-                exp.update()
             except sqo.exc.NoResultFound:
                 exp = experiment_factory(type, p)
-            self.session.add(exp)
+
+            exp.update()
+
+            if len(exp.files) > 0:
+                self.session.add(exp)
         self.session.commit()
 
     def experiments(self, *args, **kwargs):

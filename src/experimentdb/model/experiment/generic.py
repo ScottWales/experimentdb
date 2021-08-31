@@ -4,6 +4,7 @@ from ..stream import Stream
 
 import os
 import typing as T
+import logging
 
 
 class Generic(Experiment):
@@ -20,11 +21,22 @@ class Generic(Experiment):
                     continue
 
                 p = os.path.join(root, f)
-                print(p)
-                yield NCFile(p, self)
+                relp = os.path.relpath(p, self.path)
+                outf = None
 
-    def identify_streams(self, files: T.Iterable[File]) -> T.Dict[str, Stream]:
-        streams = {f.relative_path: [f] for f in files}
-        print(streams)
+                # Is the file already known?
+                for ef in self.files:
+                    if ef.relative_path == relp:
+                        logging.debug("existing file %s", relp)
+                        outf = ef
 
-        return {k: Stream(k, v) for k, v in streams.items()}
+                # Not already known
+                if outf is None:
+                    logging.debug("new file %s", relp)
+                    outf = NCFile(p, self)
+
+                # Yield the found file
+                yield outf
+
+    def identify_stream(self, file: File) -> str:
+        return file.relative_path

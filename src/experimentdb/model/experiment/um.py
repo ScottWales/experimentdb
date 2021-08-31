@@ -1,51 +1,34 @@
 from .base import Experiment
-from ..file import File, UMFile
+from ..file import File, file_factory
 from ..stream import Stream
 
 import os
+import logging
+from glob import glob
 
 import typing as T
 
 
 class UMRose(Experiment):
     type = "um-rose"
+    file_pattern = "share/data/History_Data/*"
 
     def __init__(self, path):
         super().__init__(path)
 
     def find_files(self) -> T.Iterator[File]:
         """
-        Finds UM format files in a Rose run
+        Finds files in a Rose run
         """
-        import mule
 
         os.environ["UMDIR"] = "/g/data/access/projects/access/umdir"
-        rel_path = "share/data/History_Data"
-        path = os.path.join(self.path, rel_path)
+        yield from super().find_files()
 
-        for root, dir, files in os.walk(path):
-            for f in files:
-                p = os.path.join(root, f)
-                try:
-                    yield UMFile(p, self)
-                except ValueError:
-                    # Not a UM file
-                    continue
-
-    def identify_streams(self, files) -> T.Dict[str, Stream]:
+    def identify_stream(self, file) -> str:
         """
         Group files into streams with the same variables
         """
-        streams: T.Dict[str, T.List[File]] = {}
-
-        for f in files:
-            s = os.path.basename(f.relative_path)[:9]
-            if s in streams:
-                streams[s].append(f)
-            else:
-                streams[s] = [f]
-
-        return {k: Stream(k, v) for k, v in streams.items()}
+        return os.path.basename(file.relative_path)[:9]
 
     def find_variables(self, file):
         """

@@ -71,6 +71,7 @@ file = sqa.Table(
     metadata,
     sqa.Column("id", sqa.Integer, primary_key=True),
     sqa.Column("stream_id", sqa.Integer, sqa.ForeignKey("stream.id")),
+    sqa.Column("experiment_id", sqa.Integer, sqa.ForeignKey("experiment.id")),
     sqa.Column("relative_path", sqa.String, nullable=False),
     sqa.Column("start_date", sqa.Float),
     sqa.Column("end_date", sqa.Float),

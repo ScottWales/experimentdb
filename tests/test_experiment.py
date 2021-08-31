@@ -14,15 +14,23 @@ def test_experiment_generic(session, tmp_path):
 
     exp = Generic(tmp_path)
     assert exp.type == "generic"
-    print(exp.streams)
 
+    # Scan the directory
+    exp.update()
     session.add(exp)
     session.commit()
 
-    print(exp.streams)
     assert exp.id is not None
+    assert len(exp.streams) == 1
+    assert len(exp.files) == 1
+
+    # Rescan a second time
+    exp.update()
+    session.add(exp)
+    session.commit()
 
     assert len(exp.streams) == 1
+    assert len(exp.files) == 1
 
 
 def test_experiment_factory():
