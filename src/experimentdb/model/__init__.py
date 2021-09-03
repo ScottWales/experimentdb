@@ -3,6 +3,7 @@ ORM model of the database
 """
 from ..utils import all_subclasses
 from .experiment.base import Experiment
+from .experiment import experiment_factory
 
 import sqlalchemy.orm as sqo
 import sqlalchemy as sqa

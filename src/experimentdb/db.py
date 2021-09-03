@@ -1,5 +1,8 @@
 """
-ExperimentDB database
+ExperimentDB SQLAlchemy database tables
+
+These tables hold all of the data ExperimentDB knows about, and can be used for
+manual searches
 """
 
 
@@ -14,7 +17,7 @@ def connect(config):
     Connect to the database
 
     Args:
-        config: from experimentdb.config.read_config()
+        config: configuration data from :func:`experimentdb.config.read_config()`
     Returns:
         sqlalchemy.engine connected to the configured database
     """
@@ -25,13 +28,6 @@ def connect(config):
     return engine
 
 
-"""
-A single model run
-
-name: Run name
-path: Base path of the run
-type: Experiment type, see experimentdb.experiment
-"""
 experiment = sqa.Table(
     "experiment",
     metadata,
@@ -41,15 +37,14 @@ experiment = sqa.Table(
     sqa.Column("type_id", sqa.String, nullable=False),
     sqa.UniqueConstraint("type_id", "path"),
 )
-
 """
-A stream of files with identical variables, but covering different times
+A single model run
 
-The stream is made up of multiple files, found in the 'file' table
-
-The stream is made up of multiple variables, present in all attached files,
-found in the 'variable' table
+:param name: Run name
+:param path: Base path of the run
+:param type_id: Experiment type, see :func:`experimentdb.model.experiment_factory`
 """
+
 stream = sqa.Table(
     "stream",
     metadata,
@@ -60,12 +55,15 @@ stream = sqa.Table(
     sqa.Column("calendar", sqa.String),
     sqa.UniqueConstraint("experiment_id", "name"),
 )
-
 """
-A single file in the stream
+A stream of files with identical variables, but covering different times
 
-The file contains all the variables attached to the stream
+The stream is made up of multiple files, found in the 'file' table
+
+The stream is made up of multiple variables, present in all attached files,
+found in the 'variable' table
 """
+
 file = sqa.Table(
     "file",
     metadata,
@@ -78,13 +76,12 @@ file = sqa.Table(
     sqa.Column("type_id", sqa.String, nullable=False),
     sqa.UniqueConstraint("stream_id", "relative_path"),
 )
-
 """
-A variable in the stream
+A single file in the stream
 
-The variable is expected to be present for all files in the same stream, with
-each file covering a different date range
+The file contains all the variables attached to the stream
 """
+
 variable = sqa.Table(
     "variable",
     metadata,
@@ -98,3 +95,9 @@ variable = sqa.Table(
     sqa.Column("lon_resolution", sqa.String),
     sqa.Column("units", sqa.String),
 )
+"""
+A variable in the stream
+
+The variable is expected to be present for all files in the same stream, with
+each file covering a different date range
+"""

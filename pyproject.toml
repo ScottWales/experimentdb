@@ -6,4 +6,4 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules" # --doctest-glob='*.md'"
+addopts = "--doctest-modules --doctest-glob='*.md'"

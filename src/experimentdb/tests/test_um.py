@@ -44,3 +44,7 @@ def test_um_identify_variables():
     vs = file.identify_variables()
 
     assert "m01s05i270" in [v.name for v in vs]
+
+    v = {v.name: v for v in vs}["m01s05i270"]
+    assert v.long_name == "SHALLOW CONVECTION INDICATOR"  # Variable name in STASH
+    assert v.method == "mean: time (1 hour)"

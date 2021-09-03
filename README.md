@@ -9,6 +9,17 @@ Setup for doctests
 
 --->
 
+```python
+>>> db = experimentdb.ExperimentDB()
+
+```
+
+<!---
+>>> from experimentdb.tests.conftest import setup_sample_data
+>>> setup_sample_data(db.session)
+
+--->
+
 ## Configuring the database
 
 The database is configured using a Yaml file:
@@ -61,8 +72,10 @@ experimentdb list
 Get a pandas DataFrame of all experiments:
 
 ```python
->>> db = experimentdb.ExperimentDB()
 >>> db.experiments()
+       name                                  path  type_id
+id                                                        
+1   u-ab123  /scratch/w35/saw562/cylc-run/u-ab123  um-rose
 
 ```
 
@@ -85,14 +98,16 @@ experimentdb list --tags "convection"
 Print a list of matching variables (see `experimentdb search --help` for format options)
 
 ```bash
-experimentdb search --standard_name temperature --freq M
+experimentdb search --standard_name temperature --freq P1M
 ```
 
 Get a pandas DataFrame of all variables matching a search:
 
 ```python
->>> db = experimentdb.ExperimentDB()
->>> db.search(standard_name='temperature', freq='M')
+>>> db.search(standard_name='temperature', freq='1M')
+   experiment     stream variable
+id                               
+1     u-ab123  ab123a.pa        T
 
 ```
 
@@ -102,7 +117,6 @@ Load variables returned by a search (the search returns a pandas DataFrame, whic
 further filtered manually):
 
 ```python
->>> db = experimentdb.ExperimentDB()
 >>> vars = db.search(experiment='u-ab123', standard_name='temperature', freq='M')
 >>> db.open_datasets(vars, time=slice('1990-01-01', '2000-01-01'))
 
@@ -111,7 +125,6 @@ further filtered manually):
 Or use the search terms directly in `open_dataset()`:
 
 ```python
->>> db = experimentdb.ExperimentDB()
 >>> vars = db.open_datasets(experiment='u-ab123', standard_name='temperature', freq='M', time=slice('1990-01-01', '2000-01-01'))
 
 ```
