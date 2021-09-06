@@ -132,7 +132,7 @@ class ExperimentDB:
                 db.file.c.relative_path,
                 db.variable.c.id,
             ]
-        ).select_from(db.experiment.join(db.stream).join(db.variable))
+        ).select_from(db.experiment.join(db.stream).join(db.variable).join(db.file, db.file.c.stream_id == db.stream.c.id))
 
         if standard_name is not None:
             sel = sel.where(db.variable.c.standard_name == standard_name)

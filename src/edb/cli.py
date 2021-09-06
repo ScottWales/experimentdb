@@ -125,7 +125,7 @@ class Files(CLIFunction):
         parser.add_argument("--standard_name", help="variable standard_name")
 
     def call(self, expdb, args):
-        with pandas.set_option("display.max_colwidth", None):
+        with pandas.option_context("display.max_colwidth", None):
             print(
                 expdb.files(
                     experiment=args.experiment, standard_name=args.standard_name
