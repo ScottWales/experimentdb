@@ -11,6 +11,62 @@ import logging
 import os
 import xarray
 
+search_params = {
+    "experiment": {
+        "description": "experiment name",
+        "column": db.experiment.c.name,
+    },
+    "experiment_type": {
+        "description": "experiment type",
+        "column": db.experiment.c.type_id,
+    },
+    "stream": {
+        "description": "stream name",
+        "column": db.stream.c.name,
+    },
+    "variable": {
+        "description": "variable name",
+        "column": db.variable.c.name,
+    },
+    "standard_name": {
+        "description": "variable cf standard_name",
+        "column": db.variable.c.standard_name,
+    },
+    "long_name": {
+        "description": "variable long_name",
+        "column": db.variable.c.long_name,
+    },
+}
+
+
+def document_search_args(func):
+    """
+    Add search_params documentation to a function
+    """
+    args = []
+    for k, v in search_params.items():
+        args.append(f"{k}: {v['description']}")
+    doc = "\n        ".join(args)
+
+    func.__doc__ = func.__doc__.replace("{{search_args}}", doc)
+
+    return func
+
+
+@document_search_args
+def search_filter(sel: sqa.select, **kwargs):
+    """
+    Filters a database query using ExperimentDB search parameters
+
+    Args:
+        {{search_args}}
+    """
+    # Applies the filters listed in search_params
+    for k, v in kwargs.items():
+        sel = sel.where(search_params[k]["column"] == v)
+
+    return sel
+
 
 class ExperimentDB:
     """
@@ -85,17 +141,15 @@ class ExperimentDB:
         """
         return self.session.query(*args)
 
-    def search(
-        self, /, experiment: str = None, standard_name: str = None, freq: str = None
-    ) -> pandas.DataFrame:
+    @document_search_args
+    def search(self, /, **kwargs) -> pandas.DataFrame:
         """
-        Perform a search on the database
+        Perform a search of experiments/streams/variables in the database
 
         Args:
-            experiment: Experiment name
-            standard_name: Standard name of variable
-            freq: Variable output frequency
+            {{search_args}}
         """
+        # Columns to return
         sel = sqa.select(
             [
                 db.experiment.c.name.label("experiment"),
@@ -108,11 +162,8 @@ class ExperimentDB:
             ]
         ).select_from(db.experiment.join(db.stream).join(db.variable))
 
-        if standard_name is not None:
-            sel = sel.where(db.variable.c.standard_name == standard_name)
-
-        if experiment is not None:
-            sel = sel.where(db.experiment.c.name == experiment)
+        # Filter the search
+        sel = search_filter(sel, **kwargs)
 
         return pandas.read_sql(
             sel,
@@ -120,25 +171,29 @@ class ExperimentDB:
             index_col="id",
         )
 
-    def files(
-        self, /, experiment: str = None, standard_name: str = None, freq: str = None
-    ) -> pandas.DataFrame:
+    @document_search_args
+    def files(self, /, **kwargs) -> pandas.DataFrame:
         """
         List the files present in matching variables
+
+        Args:
+            {{search_args}}
         """
+        # Columns to return
         sel = sqa.select(
             [
                 db.experiment.c.path,
                 db.file.c.relative_path,
                 db.variable.c.id,
             ]
-        ).select_from(db.experiment.join(db.stream).join(db.variable).join(db.file, db.file.c.stream_id == db.stream.c.id))
+        ).select_from(
+            db.experiment.join(db.stream)
+            .join(db.variable)
+            .join(db.file, db.file.c.stream_id == db.stream.c.id)
+        )
 
-        if standard_name is not None:
-            sel = sel.where(db.variable.c.standard_name == standard_name)
-
-        if experiment is not None:
-            sel = sel.where(db.experiment.c.name == experiment)
+        # Filter the search
+        sel = search_filter(sel, **kwargs)
 
         df = pandas.read_sql(
             sel,
@@ -148,6 +203,7 @@ class ExperimentDB:
 
         return df.apply(lambda row: os.path.join(row.path, row.relative_path), axis=1)
 
+    @document_search_args
     def open_dataarrays(
         self, vars: pandas.DataFrame = None, time: slice = None, **kwargs
     ) -> pandas.Series:
@@ -171,8 +227,7 @@ class ExperimentDB:
                   be the database id of the variable (as  is returned by
                   :meth:`search`)
             time: time slice to open
-            kwargs: if present, passed to :meth:`search` to select variables to
-                    open
+            {{search_args}}
         """
 
         if vars is None:

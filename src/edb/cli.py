@@ -4,7 +4,7 @@ import yaml
 import logging
 import pandas
 
-from .experimentdb import ExperimentDB
+from .experimentdb import ExperimentDB, search_params
 from .model.experiment import Experiment
 from .utils import all_subclasses
 
@@ -103,13 +103,14 @@ class Search(CLIFunction):
     help = "search output variables"
 
     def setup_parser(self, parser):
-        parser.add_argument("--experiment", help="experiment name")
-        parser.add_argument("--standard_name", help="variable standard_name")
+        for k, v in search_params.items():
+            parser.add_argument(f"--{k}", help=v["description"])
 
     def call(self, expdb, args):
-        print(
-            expdb.search(experiment=args.experiment, standard_name=args.standard_name)
-        )
+        # search_params in args
+        args = vars(args)
+        args_params = args.keys() & search_params.keys()
+        print(expdb.search())
 
 
 class Files(CLIFunction):
@@ -121,16 +122,16 @@ class Files(CLIFunction):
     help = "list file paths"
 
     def setup_parser(self, parser):
-        parser.add_argument("--experiment", help="experiment name")
-        parser.add_argument("--standard_name", help="variable standard_name")
+        for k, v in search_params.items():
+            parser.add_argument(f"--{k}", help=v["description"])
 
     def call(self, expdb, args):
+        # search_params in args
+        args = vars(args)
+        args_params = args.keys() & search_params.keys()
+
         with pandas.option_context("display.max_colwidth", None):
-            print(
-                expdb.files(
-                    experiment=args.experiment, standard_name=args.standard_name
-                )
-            )
+            print(expdb.files(**{k: args[k] for k in args_params}))
 
 
 class ShowConfig(CLIFunction):

@@ -129,7 +129,7 @@ edb search --standard_name temperature --freq P1M
 Get a pandas DataFrame of all variables matching a search:
 
 ```python
->>> db.search(standard_name='temperature', freq='1M')
+>>> db.search(standard_name='temperature')
    experiment     stream variable standard_name time_resolution long_name
 id                                                                       
 1     u-ab123  ab123a.pa        T   temperature            None      None
@@ -149,7 +149,7 @@ edb files --standard_name temperature --freq P1M
 Get a pandas DataFrame of all files matching a search:
 
 ```python
->>> db.files(standard_name='temperature', freq='1M')
+>>> db.files(standard_name='temperature')
 id
 1    /scratch/w35/saw562/cylc-run/u-ab123/share/dat...
 1    /scratch/w35/saw562/cylc-run/u-ab123/share/dat...
@@ -173,8 +173,7 @@ DataArrays (if desired the search results can be further filtered manually):
 
 ```python
 >>> vars = db.search(experiment='u-ab123',
-...                  standard_name='temperature',
-...                  freq='M')
+...                  standard_name='temperature')
 >>> db.open_dataarrays(vars, time=slice('1990-01-01', '2000-01-01'))
 id
 1    [[[<xarray.DataArray 'T' ()>\narray(0.), <xarr...
@@ -187,7 +186,6 @@ Or use the search terms directly in `open_dataset()`:
 ```python
 >>> db.open_dataarrays(experiment='u-ab123',
 ...                    standard_name='temperature',
-...                    freq='M',
 ...                    time=slice('1990-01-01', '2000-01-01'))
 id
 1    [[[<xarray.DataArray 'T' ()>\narray(0.), <xarr...
