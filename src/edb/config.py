@@ -4,7 +4,7 @@ import os
 
 config_defaults = {
     "database": os.path.expandvars(
-        "sqlite:////scratch/$PROJECT/$USER/tmp/experimentdb.sqlite3"
+        f"sqlite:///{os.environ.get('TMPDIR', '/tmp')}/experimentdb.sqlite3"
     ),
     "scan paths": [],
 }

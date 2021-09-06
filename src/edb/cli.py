@@ -109,7 +109,7 @@ class ShowConfig(CLIFunction):
 
 
 description = """
-Experiment Database
+⛅ Climate and Weather Experiment Database
 
 Maintains a record of experiments, allowing searches through experiments and
 outputs
