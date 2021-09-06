@@ -1,15 +1,34 @@
 # ⛅ edb - climate and weather experiment database
 
-<!---
 
+`edb` stores a record of what experiments have been run, including output files
+and variables, in a sqlite database. You can access it through the command line
+or python
+
+`edb` knows about these experiment types:
+<!---
+>>> from edb.model.experiment import Experiment
+>>> from edb.utils import all_subclasses
+>>> ex = {e.type: e for e in all_subclasses(Experiment) if e.type is not None}
+>>> for e in sorted(ex):
+...     print(f"* {e}: {ex[e].description}") #--->
+* access-cm-payu: ACCESS-CM 1.x run by Payu
+* access-cm-rose: ACCESS-CM 2.x run by Rose/Cylc
+* access-cm-script: ACCESS-CM 1.x run by CSIRO ksh script
+* generic: Generic NetCDF output
+* um-rose: UM >= vn10 run by Rose/Cylc
+* um-umui: UM < vn10 run by UMUI
+
+<!---
 Setup for doctests
->>> import edb
 >>> from edb.config import config_defaults
 >>> config_defaults['database'] = 'sqlite+pysqlite:///:memory:'
+# --->
 
---->
+If interacting with `edb` in python, first connect to the database
 
 ```python
+>>> import edb
 >>> db = edb.ExperimentDB()
 
 ```
@@ -17,8 +36,7 @@ Setup for doctests
 <!---
 >>> from edb.tests.conftest import setup_sample_data
 >>> setup_sample_data(db.session)
-
---->
+# --->
 
 ## Configuring the database
 
@@ -49,7 +67,11 @@ Python
 
 ## Scanning experiments
 
-Scan all experiments in the configuration
+Scanning an experiment directory adds its path and the associated output
+files/variables to the database. In order for `edb` to correctly find the 
+outputs and experiment metadata you can specify the experiment type.
+
+Scan all experiments listed in the config file
 
 ```bash
 edb scan
@@ -63,7 +85,8 @@ edb scan --type um-cylc /scratch/$PROJECT/$USER/cylc-run/u-ab123
 
 ## Listing experiments
 
-Print a list of experiments known to the database (see `edb list --help` for format options)
+Print a list of experiments known to the database (see `edb list --help` for
+format options)
 
 ```bash
 edb list
@@ -113,11 +136,14 @@ id
 
 ## Loading variables
 
-Load variables returned by a search (the search returns a pandas DataFrame, which can be
+Within python you can load the variables returned by a search as xarray
+DataArrays (the search returns a pandas DataFrame, which can be
 further filtered manually):
 
 ```python
->>> vars = db.search(experiment='u-ab123', standard_name='temperature', freq='M')
+>>> vars = db.search(experiment='u-ab123',
+...                  standard_name='temperature',
+...                  freq='M')
 >>> db.open_datasets(vars, time=slice('1990-01-01', '2000-01-01'))
 
 ```
@@ -125,6 +151,9 @@ further filtered manually):
 Or use the search terms directly in `open_dataset()`:
 
 ```python
->>> vars = db.open_datasets(experiment='u-ab123', standard_name='temperature', freq='M', time=slice('1990-01-01', '2000-01-01'))
+>>> vars = db.open_datasets(experiment='u-ab123',
+...                         standard_name='temperature',
+...                         freq='M',
+...                         time=slice('1990-01-01', '2000-01-01'))
 
 ```

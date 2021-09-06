@@ -9,6 +9,7 @@ import logging
 
 class Generic(Experiment):
     type = "generic"
+    description = "Generic NetCDF output"
 
     def __init__(self, path):
         super().__init__(path)

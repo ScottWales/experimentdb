@@ -11,6 +11,7 @@ import typing as T
 
 class UMRose(Experiment):
     type = "um-rose"
+    description = "UM >= vn10 run by Rose/Cylc"
     file_pattern = "share/data/History_Data/*"
 
     def __init__(self, path):
@@ -48,3 +49,4 @@ class UMRose(Experiment):
 
 class UMUMUI(Experiment):
     type = "um-umui"
+    description = "UM < vn10 run by UMUI"
