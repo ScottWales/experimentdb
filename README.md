@@ -91,7 +91,7 @@ Print a list of experiments known to the database (see `edb list --help` for
 format options)
 
 ```bash
-edb list
+edb experiments
 ```
 
 Get a pandas DataFrame of all experiments:

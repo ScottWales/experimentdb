@@ -78,7 +78,7 @@ class List(CLIFunction):
     List known experiments
     """
 
-    name = "list"
+    name = "experiments"
     help = "list known experiments"
 
     def setup_parser(self, parser):
@@ -91,6 +91,24 @@ class List(CLIFunction):
 
     def call(self, expdb, args):
         print(expdb.experiments())
+
+
+class Search(CLIFunction):
+    """
+    Search through output variables
+    """
+
+    name = "search"
+    help = "search output variables"
+
+    def setup_parser(self, parser):
+        parser.add_argument("--experiment", help="experiment name")
+        parser.add_argument("--standard_name", help="variable standard_name")
+
+    def call(self, expdb, args):
+        print(
+            expdb.search(experiment=args.experiment, standard_name=args.standard_name)
+        )
 
 
 class ShowConfig(CLIFunction):
