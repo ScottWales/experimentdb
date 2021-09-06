@@ -73,11 +73,13 @@ class UMFile(File):
         logging.debug("identify_variables %s", self.relative_path)
         try:
             import iris
+            import mule
 
             path = os.path.join(self.experiment.path, self.relative_path)
+            stashmaster = mule.STASHmaster.from_umfile(path)
             cubes = iris.load(path)
 
-            return [Variable.from_iris(c) for c in cubes]
+            return [Variable.from_iris(c, stashmaster=stashmaster) for c in cubes]
         except Exception as e:
             logging.warning(e)
             return []

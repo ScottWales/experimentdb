@@ -21,8 +21,9 @@ or python
 
 <!---
 Setup for doctests
->>> from edb.config import config_defaults
->>> config_defaults['database'] = 'sqlite+pysqlite:///:memory:'
+>>> from unittest.mock import patch
+>>> patcher = patch('edb.config.read_config', return_value={'database': 'sqlite+pysqlite:///:memory:'})
+>>> _ = patcher.start()
 
 --->
 
@@ -35,6 +36,7 @@ If interacting with `edb` in python, first connect to the database
 ```
 
 <!---
+>>> _ = patcher.stop()
 >>> from edb.tests.conftest import setup_sample_data
 >>> setup_sample_data(db.session)
 
@@ -163,7 +165,6 @@ Within python you can load the variables returned by a search as xarray
 DataArrays (if desired the search results can be further filtered manually):
 
 <!---
->>> from unittest.mock import patch
 >>> import xarray
 >>> import numpy
 >>> patcher = patch('edb.experimentdb._open_var_id', return_value=xarray.DataArray(numpy.zeros((10,10,10)), dims=['time', 'lat','lon'], name='T'))
