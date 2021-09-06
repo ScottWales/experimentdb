@@ -101,6 +101,9 @@ class ExperimentDB:
                 db.experiment.c.name.label("experiment"),
                 db.stream.c.name.label("stream"),
                 db.variable.c.name.label("variable"),
+                db.variable.c.standard_name,
+                db.variable.c.time_resolution,
+                db.variable.c.long_name,
                 db.variable.c.id,
             ]
         ).select_from(db.experiment.join(db.stream).join(db.variable))

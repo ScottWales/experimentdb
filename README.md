@@ -130,9 +130,9 @@ Get a pandas DataFrame of all variables matching a search:
 
 ```python
 >>> db.search(standard_name='temperature', freq='1M')
-   experiment     stream variable
-id                               
-1     u-ab123  ab123a.pa        T
+   experiment     stream variable standard_name time_resolution long_name
+id                                                                       
+1     u-ab123  ab123a.pa        T   temperature            None      None
 
 ```
 
