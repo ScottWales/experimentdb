@@ -110,7 +110,7 @@ class Search(CLIFunction):
         # search_params in args
         args = vars(args)
         args_params = args.keys() & search_params.keys()
-        print(expdb.search())
+        print(expdb.search(**{k: args[k] for k in args_params}))
 
 
 class Files(CLIFunction):

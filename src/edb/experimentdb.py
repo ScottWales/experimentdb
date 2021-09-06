@@ -63,7 +63,8 @@ def search_filter(sel: sqa.select, **kwargs):
     """
     # Applies the filters listed in search_params
     for k, v in kwargs.items():
-        sel = sel.where(search_params[k]["column"] == v)
+        if v is not None:
+            sel = sel.where(search_params[k]["column"] == v)
 
     return sel
 
