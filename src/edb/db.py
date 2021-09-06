@@ -50,7 +50,7 @@ stream = sqa.Table(
     metadata,
     sqa.Column("id", sqa.Integer, primary_key=True),
     sqa.Column("experiment_id", sqa.Integer, sqa.ForeignKey("experiment.id")),
-    sqa.Column("name", sqa.String),
+    sqa.Column("name", sqa.String, nullable=False),
     sqa.Column("time_units", sqa.String),
     sqa.Column("calendar", sqa.String),
     sqa.UniqueConstraint("experiment_id", "name"),

@@ -3,11 +3,13 @@ from .model.experiment import experiment_factory, Experiment
 import sqlalchemy.orm as sqo
 import sqlalchemy as sqa
 from . import db
+import typing as T
 
 import glob
 import pandas
 import logging
 import os
+import xarray
 
 
 class ExperimentDB:
@@ -20,7 +22,7 @@ class ExperimentDB:
     - Open variables with :meth:`open_datasets()`
     """
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, conn: sqa.engine.Connection = None):
         """
         Connect to the database
 
@@ -28,7 +30,10 @@ class ExperimentDB:
             config: Path to configuration file (see :func:`read_config()`)
         """
         self.config = read_config(config)
-        self.db = db.connect(self.config)
+        if conn is None:
+            self.db = db.connect(self.config)
+        else:
+            self.db = conn
         self.session = sqo.Session(self.db)
 
     def scan_all(self):
@@ -112,11 +117,31 @@ class ExperimentDB:
             index_col="id",
         )
 
-    def open_datasets(
+    def open_dataarrays(
         self, vars: pandas.DataFrame = None, time: slice = None, **kwargs
     ) -> pandas.Series:
         """
         Open variables as xarray objects
+
+        If vars is present, those variables will be opened (using the dataframe
+        index as the variable id to open).
+
+        If kwargs are present, those terms are used to search the database,
+        equivalent to running::
+
+            vars = db.search(**kwargs)
+            db.open_datasets(vars)
+
+        If both vars and kwargs are present, the records listed in vars are
+        further filtered by the search terms in kwargs.
+
+        Args:
+            vars: pandas.DataFrame listing variables to open, index column must
+                  be the database id of the variable (as  is returned by
+                  :meth:`search`)
+            time: time slice to open
+            kwargs: if present, passed to :meth:`search` to select variables to
+                    open
         """
 
         if vars is None:
@@ -125,4 +150,47 @@ class ExperimentDB:
             search_vars = self.search(**kwargs)
             vars = pandas.merge(vars, search_vars, how="inner")
 
-        return None
+        results = [_open_var_id(self.db, id, time) for id in vars.index]
+        return pandas.Series(results, index=vars.index)
+
+
+def _open_var_id(
+    conn: sqa.engine.Connection, variable_id: int, time: slice = None
+) -> xarray.DataArray:
+    """
+    Open the files for a specific variable_id
+    """
+
+    # Find the files for this variable
+    files = (
+        sqa.select(
+            [
+                db.experiment.c.path,
+                db.file.c.relative_path,
+                db.file.c.type_id,
+                db.file.c.start_date,
+                db.file.c.end_date,
+                db.variable.c.name,
+            ]
+        )
+        .select_from(db.experiment.join(db.stream).join(db.file).join(db.variable))
+        .where(db.variable.c.id == variable_id)
+        .order_by(db.file.c.start_date)
+    )
+
+    das = []
+    for path, rel_path, type, start, end, varname in conn.execute(files):
+        path = os.path.join(path, rel_path)
+
+        if type == "netcdf":
+            da = xarray.open_dataset(path)[varname]
+        else:
+            import iris
+
+            cubes = iris.load_cubes(path, iris.AttributeConstraint(STASH=varname))
+            # TODO: handle multiple matches
+            da = xarray.DataArray.from_iris(cubes[0])
+
+    das.append(da)
+
+    return xarray.concat(das, dim="time")

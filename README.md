@@ -139,23 +139,42 @@ id
 ## Loading variables
 
 Within python you can load the variables returned by a search as xarray
-DataArrays (the search returns a pandas DataFrame, which can be
-further filtered manually):
+DataArrays (if desired the search results can be further filtered manually):
+
+<!---
+>>> from unittest.mock import patch
+>>> import xarray
+>>> import numpy
+>>> patcher = patch('edb.experimentdb._open_var_id', return_value=xarray.DataArray(numpy.zeros((10,10,10)), dims=['time', 'lat','lon'], name='T'))
+>>> _ = patcher.start()
+
+--->
 
 ```python
 >>> vars = db.search(experiment='u-ab123',
 ...                  standard_name='temperature',
 ...                  freq='M')
->>> db.open_datasets(vars, time=slice('1990-01-01', '2000-01-01'))
+>>> db.open_dataarrays(vars, time=slice('1990-01-01', '2000-01-01'))
+id
+1    [[[<xarray.DataArray 'T' ()>\narray(0.), <xarr...
+dtype: object
 
 ```
 
 Or use the search terms directly in `open_dataset()`:
 
 ```python
->>> vars = db.open_datasets(experiment='u-ab123',
-...                         standard_name='temperature',
-...                         freq='M',
-...                         time=slice('1990-01-01', '2000-01-01'))
+>>> db.open_dataarrays(experiment='u-ab123',
+...                    standard_name='temperature',
+...                    freq='M',
+...                    time=slice('1990-01-01', '2000-01-01'))
+id
+1    [[[<xarray.DataArray 'T' ()>\narray(0.), <xarr...
+dtype: object
 
 ```
+
+<!---
+>>> _ = patcher.stop()
+
+--->
