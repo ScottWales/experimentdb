@@ -35,7 +35,7 @@ class Variable:
             v.name = cube.name
 
         if stashmaster is not None and stash is not None:
-            v.long_name = stashmaster[stash.lbuser3()]
+            v.long_name = stashmaster[stash.lbuser3()].name
         else:
             v.long_name = cube.long_name
 

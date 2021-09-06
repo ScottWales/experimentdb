@@ -22,7 +22,7 @@ or python
 <!---
 Setup for doctests
 >>> from unittest.mock import patch
->>> patcher = patch('edb.config.read_config', return_value={'database': 'sqlite+pysqlite:///:memory:'})
+>>> patcher = patch('edb.experimentdb.read_config', return_value={'database': 'sqlite+pysqlite:///:memory:'})
 >>> _ = patcher.start()
 
 --->

@@ -76,7 +76,8 @@ class UMFile(File):
             import mule
 
             path = os.path.join(self.experiment.path, self.relative_path)
-            stashmaster = mule.STASHmaster.from_umfile(path)
+            mf = mule.load_umfile(path)
+            stashmaster = mule.STASHmaster.from_umfile(mf)
             cubes = iris.load(path)
 
             return [Variable.from_iris(c, stashmaster=stashmaster) for c in cubes]
