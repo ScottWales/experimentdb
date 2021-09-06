@@ -11,13 +11,13 @@ or python
 >>> from edb.utils import all_subclasses
 >>> ex = {e.type: e for e in all_subclasses(Experiment) if e.type is not None}
 >>> for e in sorted(ex):
-...     print(f"* {e}: {ex[e].description}") #--->
-* access-cm-payu: ACCESS-CM 1.x run by Payu
-* access-cm-rose: ACCESS-CM 2.x run by Rose/Cylc
-* access-cm-script: ACCESS-CM 1.x run by CSIRO ksh script
-* generic: Generic NetCDF output
-* um-rose: UM >= vn10 run by Rose/Cylc
-* um-umui: UM < vn10 run by UMUI
+...     print(f"* **{e}**: {ex[e].description}") #--->
+* **access-cm-payu**: ACCESS-CM 1.x run by Payu
+* **access-cm-rose**: ACCESS-CM 2.x run by Rose/Cylc
+* **access-cm-script**: ACCESS-CM 1.x run by CSIRO ksh script
+* **generic**: Generic NetCDF output
+* **um-rose**: UM >= vn10 run by Rose/Cylc
+* **um-umui**: UM < vn10 run by UMUI
 
 <!---
 Setup for doctests
