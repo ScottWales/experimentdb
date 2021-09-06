@@ -6,6 +6,7 @@ import pathlib
 from glob import glob
 import logging
 from ..file import file_factory
+from datetime import datetime
 
 from ..stream import Stream
 
@@ -30,18 +31,20 @@ class Experiment:
 
         for path in glob(os.path.join(self.path, self.file_pattern)):
             rel = os.path.relpath(path, self.path)
-            ff = None
+            ff: T.Optional[File] = None
             for ef in self.files:
                 if ef.relative_path == rel:
-                    logging.debug("existing file %s", rel)
                     ff = ef
+                    logging.debug("existing file %s", rel)
 
             if ff is None:
-                logging.debug("new file %s", rel)
                 ff = file_factory(rel, self)
+                logging.debug("new file %s", rel)
 
             if ff is None:
                 continue
+
+            ff.last_seen = datetime.now()
 
             yield ff
 
@@ -55,10 +58,12 @@ class Experiment:
 
             stream = self.streams.get(stream_name)
             if stream is None:
+                logging.debug("new stream %s", stream_name)
                 stream = Stream(stream_name)
                 self.streams[stream_name] = stream
 
             if f not in stream.files:
+                logging.debug("adding to stream %s", stream_name)
                 stream.files.append(f)
 
         return self.streams
@@ -71,7 +76,9 @@ class Experiment:
         self.streams = self.collect_streams(self.files)
 
         for s in self.streams.values():
-            s.identify_variables()
+            if s.last_seen is None or (s.last_seen - datetime.now()).days > 30:
+                s.identify_variables()
+                s.last_seen = datetime.now()
 
     def identify_stream(self, file: File) -> str:
         """
