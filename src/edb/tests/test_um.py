@@ -1,11 +1,11 @@
 try:
-    from experimentdb.model.experiment.um import UMRose
+    from ..model.experiment.um import UMRose
 except ImportError:
     pass
 
 import os
 import pytest
-from experimentdb.model.file import UMFile
+from ..model.file import UMFile
 
 
 @pytest.mark.skipif(

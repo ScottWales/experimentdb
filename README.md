@@ -1,21 +1,21 @@
-# An experiment database
+# ⛅ edb - climate and weather experiment database
 
 <!---
 
 Setup for doctests
->>> import experimentdb
->>> from experimentdb.config import config_defaults
+>>> import edb
+>>> from edb.config import config_defaults
 >>> config_defaults['database'] = 'sqlite+pysqlite:///:memory:'
 
 --->
 
 ```python
->>> db = experimentdb.ExperimentDB()
+>>> db = edb.ExperimentDB()
 
 ```
 
 <!---
->>> from experimentdb.tests.conftest import setup_sample_data
+>>> from edb.tests.conftest import setup_sample_data
 >>> setup_sample_data(db.session)
 
 --->
@@ -44,7 +44,7 @@ scan paths:
 ```
 
 By default `~/.config/experimentdb.yaml` will be used, or use `--config PATH`
-on the command line / open the database with `ExperimentDB(config=PATH)` in
+on the command line / open the database with `edb.ExperimentDB(config=PATH)` in
 Python
 
 ## Scanning experiments
@@ -52,21 +52,21 @@ Python
 Scan all experiments in the configuration
 
 ```bash
-experimentdb scan
+edb scan
 ```
 
 Manually scan some paths
 
 ```bash
-experimentdb scan --type um-cylc /scratch/$PROJECT/$USER/cylc-run/u-ab123
+edb scan --type um-cylc /scratch/$PROJECT/$USER/cylc-run/u-ab123
 ```
 
 ## Listing experiments
 
-Print a list of experiments known to the database (see `experimentdb list --help` for format options)
+Print a list of experiments known to the database (see `edb list --help` for format options)
 
 ```bash
-experimentdb list
+edb list
 ```
 
 Get a pandas DataFrame of all experiments:
@@ -84,21 +84,21 @@ id
 Metadata can be added to an experiment:
 
 ```bash
-experimentdb add-metadata u-ab123 --title "Experiment Title" --tags "convection" "rainfall"
+edb add-metadata u-ab123 --title "Experiment Title" --tags "convection" "rainfall"
 ```
 
 And then used to filter searches:
 
 ```bash
-experimentdb list --tags "convection"
+edb list --tags "convection"
 ```
 
 ## Searching experiments
 
-Print a list of matching variables (see `experimentdb search --help` for format options)
+Print a list of matching variables (see `edb search --help` for format options)
 
 ```bash
-experimentdb search --standard_name temperature --freq P1M
+edb search --standard_name temperature --freq P1M
 ```
 
 Get a pandas DataFrame of all variables matching a search:

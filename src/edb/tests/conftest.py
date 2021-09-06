@@ -1,4 +1,4 @@
-from experimentdb.model import variable
+from ..model import variable
 from ..db import metadata
 from ..model import experiment_factory
 from ..model.file import UMFile

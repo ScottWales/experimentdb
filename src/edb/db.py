@@ -88,6 +88,7 @@ variable = sqa.Table(
     sqa.Column("id", sqa.Integer, primary_key=True),
     sqa.Column("stream_id", sqa.Integer, sqa.ForeignKey("stream.id")),
     sqa.Column("name", sqa.String, nullable=False, index=True),
+    sqa.Column("long_name", sqa.String),
     sqa.Column("standard_name", sqa.String, index=True),
     sqa.Column("method", sqa.String),
     sqa.Column("time_resolution", sqa.String),

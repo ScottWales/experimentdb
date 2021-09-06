@@ -1,9 +1,7 @@
-from experimentdb.model.experiment import experiment_factory
-from experimentdb.model.experiment.generic import Generic
+from ..model.experiment import experiment_factory
+from ..model.experiment.generic import Generic
 import xarray
 import numpy
-
-import experimentdb.model
 
 
 def test_experiment_generic(session, tmp_path):
