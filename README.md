@@ -23,7 +23,8 @@ or python
 Setup for doctests
 >>> from edb.config import config_defaults
 >>> config_defaults['database'] = 'sqlite+pysqlite:///:memory:'
-# --->
+
+--->
 
 If interacting with `edb` in python, first connect to the database
 
@@ -36,7 +37,8 @@ If interacting with `edb` in python, first connect to the database
 <!---
 >>> from edb.tests.conftest import setup_sample_data
 >>> setup_sample_data(db.session)
-# --->
+
+--->
 
 ## Configuring the database
 

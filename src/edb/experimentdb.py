@@ -69,7 +69,7 @@ class ExperimentDB:
         """
         List the known experiments in the database
         """
-        return pandas.read_sql(sqa.select(db.experiment), self.db, index_col="id")
+        return pandas.read_sql(sqa.select([db.experiment]), self.db, index_col="id")
 
     def query(self, *args) -> sqo.Query:
         """
