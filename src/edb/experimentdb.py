@@ -120,6 +120,34 @@ class ExperimentDB:
             index_col="id",
         )
 
+    def files(
+        self, /, experiment: str = None, standard_name: str = None, freq: str = None
+    ) -> pandas.DataFrame:
+        """
+        List the files present in matching variables
+        """
+        sel = sqa.select(
+            [
+                db.experiment.c.path,
+                db.file.c.relative_path,
+                db.variable.c.id,
+            ]
+        ).select_from(db.experiment.join(db.stream).join(db.variable))
+
+        if standard_name is not None:
+            sel = sel.where(db.variable.c.standard_name == standard_name)
+
+        if experiment is not None:
+            sel = sel.where(db.experiment.c.name == experiment)
+
+        df = pandas.read_sql(
+            sel,
+            self.db,
+            index_col="id",
+        )
+
+        return df.apply(lambda row: os.path.join(row.path, row.relative_path), axis=1)
+
     def open_dataarrays(
         self, vars: pandas.DataFrame = None, time: slice = None, **kwargs
     ) -> pandas.Series:

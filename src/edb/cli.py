@@ -2,6 +2,7 @@ import argparse
 import textwrap
 import yaml
 import logging
+import pandas
 
 from .experimentdb import ExperimentDB
 from .model.experiment import Experiment
@@ -109,6 +110,27 @@ class Search(CLIFunction):
         print(
             expdb.search(experiment=args.experiment, standard_name=args.standard_name)
         )
+
+
+class Files(CLIFunction):
+    """
+    List file paths
+    """
+
+    name = "files"
+    help = "list file paths"
+
+    def setup_parser(self, parser):
+        parser.add_argument("--experiment", help="experiment name")
+        parser.add_argument("--standard_name", help="variable standard_name")
+
+    def call(self, expdb, args):
+        with pandas.set_option("display.max_colwidth", None):
+            print(
+                expdb.files(
+                    experiment=args.experiment, standard_name=args.standard_name
+                )
+            )
 
 
 class ShowConfig(CLIFunction):

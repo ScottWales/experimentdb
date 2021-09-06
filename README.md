@@ -136,6 +136,27 @@ id
 
 ```
 
+## Listing files
+
+Print a list of file names for matching variables (see `edb files --help` for 
+format options, the 'id' column can be matched up with the results of 
+`edb search`)
+
+```bash
+edb files --standard_name temperature --freq P1M
+```
+
+Get a pandas DataFrame of all files matching a search:
+
+```python
+>>> db.files(standard_name='temperature', freq='1M')
+id
+1    /scratch/w35/saw562/cylc-run/u-ab123/share/dat...
+1    /scratch/w35/saw562/cylc-run/u-ab123/share/dat...
+dtype: object
+
+```
+
 ## Loading variables
 
 Within python you can load the variables returned by a search as xarray
