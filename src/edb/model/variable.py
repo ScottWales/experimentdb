@@ -48,4 +48,11 @@ class Variable:
     @classmethod
     def from_xarray(cls, da: xarray.DataArray) -> Variable:
         v = cls()
+
+        v.name = str(da.name)
+        v.long_name = da.attrs.get("long_name", None)
+        v.standard_name = da.attrs.get("standard_name", None)
+        v.units = da.attrs.get("units", None)
+        v.method = da.attrs.get("method", None)
+
         return v

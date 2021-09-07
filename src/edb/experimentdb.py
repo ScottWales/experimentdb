@@ -28,6 +28,10 @@ search_params = {
         "description": "variable name",
         "column": db.variable.c.name,
     },
+    "variable_id": {
+        "description": "variable database id",
+        "column": db.variable.c.id,
+    },
     "standard_name": {
         "description": "variable cf standard_name",
         "column": db.variable.c.standard_name,
@@ -147,6 +151,10 @@ class ExperimentDB:
         """
         Perform a search of experiments/streams/variables in the database
 
+        A variable_id is returned as the dataframe index, use
+        `files(variable_id=ID)` to list the files containing the variable or
+        `open_dataarray(variable_id=ID)` to open the files
+
         Args:
             {{search_args}}
         """
@@ -159,7 +167,7 @@ class ExperimentDB:
                 db.variable.c.standard_name,
                 db.variable.c.time_resolution,
                 db.variable.c.long_name,
-                db.variable.c.id,
+                db.variable.c.id.label("variable_id"),
             ]
         ).select_from(db.experiment.join(db.stream).join(db.variable))
 
@@ -169,13 +177,16 @@ class ExperimentDB:
         return pandas.read_sql(
             sel,
             self.db,
-            index_col="id",
+            index_col="variable_id",
         )
 
     @document_search_args
     def files(self, /, **kwargs) -> pandas.DataFrame:
         """
         List the files present in matching variables
+
+        A variable_id is returned as the dataframe index, use
+        `search(variable_id=ID)` to get more information about the variable
 
         Args:
             {{search_args}}
@@ -185,7 +196,7 @@ class ExperimentDB:
             [
                 db.experiment.c.path,
                 db.file.c.relative_path,
-                db.variable.c.id,
+                db.variable.c.id.label("variable_id"),
             ]
         ).select_from(
             db.experiment.join(db.stream)
@@ -199,10 +210,14 @@ class ExperimentDB:
         df = pandas.read_sql(
             sel,
             self.db,
-            index_col="id",
+            index_col="variable_id",
         )
 
-        return df.apply(lambda row: os.path.join(row.path, row.relative_path), axis=1)
+        return df.apply(
+            lambda row: {"path": os.path.join(row.path, row.relative_path)},
+            axis=1,
+            result_type="expand",
+        )
 
     @document_search_args
     def open_dataarrays(
@@ -239,6 +254,25 @@ class ExperimentDB:
 
         results = [_open_var_id(self.db, id, time) for id in vars.index]
         return pandas.Series(results, index=vars.index)
+
+    @document_search_args
+    def open_dataarray(self, **kwargs) -> xarray.DataArray:
+        """
+        Single variable version of :meth:`open_dataarrays`
+
+        An error will be raised if more than one result matches
+
+        Args:
+            See :meth:`open_dataarrays`
+        """
+
+        s = self.open_dataarrays(**kwargs)
+        if len(s) == 0:
+            raise Exception("No results found")
+        if len(s) > 1:
+            raise Exception("Multiple results found, try 'open_dataarrays' instead")
+
+        return s.iloc[0]
 
 
 def _open_var_id(

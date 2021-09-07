@@ -4,6 +4,8 @@ import pathlib
 import typing as T
 import os
 import logging
+import netCDF4
+import xarray
 
 from .variable import Variable
 
@@ -12,6 +14,9 @@ if T.TYPE_CHECKING:
 
 
 def file_factory(path: str, exp: Experiment) -> T.Optional[File]:
+    """
+    Creates a File of the right type for its contents
+    """
     if not os.path.isabs(path):
         path = os.path.join(exp.path, path)
 
@@ -21,6 +26,14 @@ def file_factory(path: str, exp: Experiment) -> T.Optional[File]:
 
         mf = mule.load_umfile(path)
         return UMFile(path, exp)
+    except:
+        pass
+
+    try:
+        # Netcdf file
+        ds = netCDF4.Dataset(path)
+        ds.close()
+        return NCFile(path, exp)
     except:
         pass
 
@@ -62,9 +75,23 @@ class NCFile(File):
     def __init__(self, path: T.Union[str, pathlib.Path], exp: Experiment):
         super().__init__(path, exp)
 
+    def identify_variables(self) -> T.List[Variable]:
+        """
+        Returns the variables found in this file
+        """
+        path = os.path.join(self.experiment.path, self.relative_path)
+
+        try:
+            with xarray.open_dataset(path) as ds:
+                return [Variable.from_xarray(v) for v in ds.data_vars.values()]
+        except ValueError:
+            # Bad dates?
+            with xarray.open_dataset(path, decode_times=False) as ds:
+                return [Variable.from_xarray(v) for v in ds.data_vars.values()]
+
 
 class UMFile(File):
-    type = "um_generic"
+    type = "um"
 
     def __init__(self, path: T.Union[str, pathlib.Path], exp: Experiment):
         super().__init__(path, exp)

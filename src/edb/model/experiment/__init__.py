@@ -2,7 +2,7 @@ from .base import Experiment
 from ...utils import all_subclasses
 
 # Import the subclasses so they're loaded
-from . import accesscm, um, generic
+from . import accesscm, um, generic, payu
 
 
 def experiment_factory(type: str, path: str) -> Experiment:

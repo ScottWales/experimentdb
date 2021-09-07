@@ -7,6 +7,7 @@ from glob import glob
 import logging
 from ..file import file_factory
 from datetime import datetime
+from itertools import chain
 
 from ..stream import Stream
 
@@ -16,7 +17,7 @@ if T.TYPE_CHECKING:
 
 class Experiment:
     type: T.Optional[str] = None
-    file_pattern = "*"
+    file_pattern: T.Union[str, T.List[str]] = "*"
 
     def __init__(self, path: T.Union[str, pathlib.Path]):
         self.name: str = os.path.basename(path)
@@ -28,8 +29,12 @@ class Experiment:
         """
         Find all files that are part of the experiment
         """
+        if isinstance(self.file_pattern, str):
+            fps = [self.file_pattern]
+        else:
+            fps = self.file_pattern
 
-        for path in glob(os.path.join(self.path, self.file_pattern)):
+        for path in chain(*[glob(os.path.join(self.path, fp)) for fp in fps]):
             rel = os.path.relpath(path, self.path)
             ff: T.Optional[File] = None
             for ef in self.files:
