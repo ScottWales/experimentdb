@@ -8,11 +8,10 @@ manual searches
 
 import sqlalchemy as sqa
 
-engine: sqa.engine = None
 metadata = sqa.MetaData()
 
 
-def connect(config):
+def connect(url):
     """
     Connect to the database
 
@@ -21,10 +20,54 @@ def connect(config):
     Returns:
         sqlalchemy.engine connected to the configured database
     """
-    global engine
-    if engine is None:
-        engine = sqa.create_engine(config["database"])
-        metadata.create_all(engine)
+    engine = sqa.create_engine(url)
+
+    experiment.create(engine)
+    stream.create(engine)
+    variable.create(engine)
+    file.create(engine)
+
+    with engine.connect() as conn:
+        r = conn.execute(sqa.text("PRAGMA table_info(variable_fts)")).all()
+
+        # Setup fts
+        if len(r) == 0:
+            commands = [
+                """
+                CREATE VIRTUAL TABLE variable_fts
+                    USING fts5(
+                        name, 
+                        long_name, 
+                        standard_name, 
+                        tokenize = 'porter', 
+                        content = variable,
+                        content_rowid = id);
+                """,
+                """
+                CREATE TRIGGER variable_fts_ai AFTER INSERT ON variable BEGIN
+                INSERT INTO variable_fts (rowid, name, long_name, standard_name)
+                    VALUES (new.id, new.name, new.long_name, new.standard_name);
+                END;
+                """,
+                """
+                CREATE TRIGGER variable_fts_ad AFTER DELETE ON variable BEGIN
+                INSERT INTO variable_fts (rowid, name, long_name, standard_name)
+                    VALUES ('delete', old.name, old.long_name, old.standard_name);
+                END;
+                """,
+                """
+                CREATE TRIGGER variable_fts_au AFTER UPDATE ON variable BEGIN
+                INSERT INTO variable_fts (rowid, name, long_name, standard_name)
+                    VALUES ('delete', old.name, old.long_name, old.standard_name);
+                INSERT INTO variable_fts (rowid, name, long_name, standard_name)
+                    VALUES (new.id, new.name, new.long_name, new.standard_name);
+                END;
+                """,
+            ]
+
+            for c in commands:
+                conn.execute(sqa.text(c))
+
     return engine
 
 
@@ -104,3 +147,13 @@ A variable in the stream
 The variable is expected to be present for all files in the same stream, with
 each file covering a different date range
 """
+
+variable_fts = sqa.Table(
+    "variable_fts",
+    metadata,
+    sqa.Column("rowid", sqa.Integer, sqa.ForeignKey("variable.id")),
+    sqa.Column("name", sqa.String),
+    sqa.Column("long_name", sqa.String),
+    sqa.Column("standard_name", sqa.String),
+    sqa.Column("variable_fts", sqa.String),
+)

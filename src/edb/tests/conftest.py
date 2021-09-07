@@ -1,5 +1,5 @@
 from ..model import variable
-from ..db import metadata
+from ..db import metadata, connect
 from ..model import experiment_factory
 from ..model.file import UMFile
 from ..model.variable import Variable
@@ -11,8 +11,7 @@ import sqlalchemy.orm
 
 @pytest.fixture(scope="session")
 def db():
-    engine = sqa.create_engine("sqlite+pysqlite:///:memory:", echo=False)
-    metadata.create_all(engine)
+    engine = connect("sqlite+pysqlite://")
 
     with engine.connect() as c:
         yield c

@@ -24,7 +24,8 @@ search_params = {
         "description": "stream name",
         "column": db.stream.c.name,
     },
-    "variable": {
+    "variable": {"description": "variable text search", "special": "variable_fts"},
+    "variable_name": {
         "description": "variable name",
         "column": db.variable.c.name,
     },
@@ -68,7 +69,10 @@ def search_filter(sel: sqa.select, **kwargs):
     # Applies the filters listed in search_params
     for k, v in kwargs.items():
         if v is not None:
-            sel = sel.where(search_params[k]["column"] == v)
+            if "column" in search_params[k]:
+                sel = sel.where(search_params[k]["column"] == v)
+            elif search_params[k]["special"] == "variable_fts":
+                sel = sel.where(db.variable_fts.c.variable_fts.match(v))
 
     return sel
 
@@ -92,7 +96,7 @@ class ExperimentDB:
         """
         self.config = read_config(config)
         if conn is None:
-            self.db = db.connect(self.config)
+            self.db = db.connect(self.config["database"])
         else:
             self.db = conn
         self.session = sqo.Session(self.db)
@@ -169,7 +173,9 @@ class ExperimentDB:
                 db.variable.c.long_name,
                 db.variable.c.id.label("variable_id"),
             ]
-        ).select_from(db.experiment.join(db.stream).join(db.variable))
+        ).select_from(
+            db.experiment.join(db.stream).join(db.variable).join(db.variable_fts)
+        )
 
         # Filter the search
         sel = search_filter(sel, **kwargs)
@@ -201,6 +207,7 @@ class ExperimentDB:
         ).select_from(
             db.experiment.join(db.stream)
             .join(db.variable)
+            .join(db.variable_fts)
             .join(db.file, db.file.c.stream_id == db.stream.c.id)
         )
 

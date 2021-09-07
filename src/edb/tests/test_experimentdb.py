@@ -41,6 +41,15 @@ def test_search(conn, sample_generic):
     assert r.index[0] == 5
 
 
+def test_fts(conn, sample_generic):
+    edb = ExperimentDB(conn=conn)
+
+    r = edb.search(variable="temperature")
+
+    # 1 variable found
+    assert len(r) == 1
+
+
 def test_open_dataarrays(conn, sample_generic):
 
     edb = ExperimentDB(conn=conn)
