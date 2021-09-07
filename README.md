@@ -15,6 +15,7 @@ or python
 * **access-cm-payu**: ACCESS-CM 1.x run by Payu
 * **access-cm-rose**: ACCESS-CM 2.x run by Rose/Cylc
 * **access-cm-script**: ACCESS-CM 1.x run by CSIRO ksh script
+* **access-om-payu**: ACCESS-OM run by Payu
 * **generic**: Generic NetCDF output
 * **um-rose**: UM >= vn10 run by Rose/Cylc
 * **um-umui**: UM < vn10 run by UMUI
@@ -132,9 +133,11 @@ Get a pandas DataFrame of all variables matching a search:
 
 ```python
 >>> db.search(standard_name='temperature')
-   experiment     stream variable standard_name time_resolution long_name
-id                                                                       
-1     u-ab123  ab123a.pa        T   temperature            None      None
+            experiment     stream  ... time_resolution long_name
+variable_id                        ...                          
+1              u-ab123  ab123a.pa  ...            None      None
+<BLANKLINE>
+[1 rows x 6 columns]
 
 ```
 
@@ -152,10 +155,10 @@ Get a pandas DataFrame of all files matching a search:
 
 ```python
 >>> db.files(standard_name='temperature')
-id
-1    /scratch/w35/saw562/cylc-run/u-ab123/share/dat...
-1    /scratch/w35/saw562/cylc-run/u-ab123/share/dat...
-dtype: object
+                                                          path
+variable_id                                                   
+1            /scratch/w35/saw562/cylc-run/u-ab123/share/dat...
+1            /scratch/w35/saw562/cylc-run/u-ab123/share/dat...
 
 ```
 
@@ -176,7 +179,7 @@ DataArrays (if desired the search results can be further filtered manually):
 >>> vars = db.search(experiment='u-ab123',
 ...                  standard_name='temperature')
 >>> db.open_dataarrays(vars, time=slice('1990-01-01', '2000-01-01'))
-id
+variable_id
 1    [[[<xarray.DataArray 'T' ()>\narray(0.), <xarr...
 dtype: object
 
@@ -188,7 +191,7 @@ Or use the search terms directly in `open_dataset()`:
 >>> db.open_dataarrays(experiment='u-ab123',
 ...                    standard_name='temperature',
 ...                    time=slice('1990-01-01', '2000-01-01'))
-id
+variable_id
 1    [[[<xarray.DataArray 'T' ()>\narray(0.), <xarr...
 dtype: object
 

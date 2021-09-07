@@ -5,7 +5,8 @@ import os
 
 
 class Payu(Experiment):
-    type = "payu"
+    type = "access-om-payu"
+    description = "ACCESS-OM run by Payu"
     file_pattern = ["output*/ocean/*.nc", "output*/ice/OUTPUT/*.nc"]
 
     def identify_stream(self, file: File) -> str:
