@@ -71,6 +71,8 @@ def search_filter(sel: sqa.select, **kwargs):
         if v is not None:
             if "column" in search_params[k]:
                 sel = sel.where(search_params[k]["column"] == v)
+
+            # Handle special filters
             elif search_params[k]["special"] == "variable_fts":
                 sel = sel.where(db.variable_fts.c.variable_fts.match(v))
 
@@ -133,7 +135,9 @@ class ExperimentDB:
 
             if len(exp.files) > 0:
                 self.session.add(exp)
-        self.session.commit()
+
+                # Commit the experiment to the database
+                self.session.commit()
 
     def experiments(self) -> pandas.DataFrame:
         """
