@@ -22,13 +22,13 @@ def connect(url):
     """
     engine = sqa.create_engine(url)
 
-    experiment.create(engine)
-    stream.create(engine)
-    variable.create(engine)
-    file.create(engine)
+    experiment.create(engine, checkfirst=True)
+    stream.create(engine, checkfirst=True)
+    variable.create(engine, checkfirst=True)
+    file.create(engine, checkfirst=True)
 
     with engine.connect() as conn:
-        r = conn.execute(sqa.text("PRAGMA table_info(variable_fts)")).all()
+        r = conn.execute(sqa.text("PRAGMA table_info(variable_fts)")).fetchall()
 
         # Setup fts
         if len(r) == 0:
