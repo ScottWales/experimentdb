@@ -173,8 +173,8 @@ class ExperimentDB:
                 db.stream.c.name.label("stream"),
                 db.variable.c.name.label("variable"),
                 db.variable.c.standard_name,
-                db.variable.c.time_resolution,
                 db.variable.c.long_name,
+                db.variable.c.time_resolution,
                 db.variable.c.id.label("variable_id"),
             ]
         ).select_from(
