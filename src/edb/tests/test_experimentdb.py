@@ -15,9 +15,27 @@ def sample_generic(conn):
     )
     conn.execute(db.stream.insert().values(id=1, experiment_id=1, name="foo"))
     conn.execute(
-        db.file.insert().values(
-            id=1, stream_id=1, experiment_id=1, type_id="netcdf", relative_path="foo.nc"
-        )
+        db.file.insert(),
+        [
+            {
+                "id": 1,
+                "stream_id": 1,
+                "experiment_id": 1,
+                "type_id": "netcdf",
+                "relative_path": "foo-jan.nc",
+                "start_date": "2010-01-01 00:00:00",
+                "end_date": "2010-02-01 00:00:00",
+            },
+            {
+                "id": 2,
+                "stream_id": 1,
+                "experiment_id": 1,
+                "type_id": "netcdf",
+                "relative_path": "foo-feb.nc",
+                "start_date": "2010-02-01 00:00:00",
+                "end_date": "2010-03-01 00:00:00",
+            },
+        ],
     )
     conn.execute(
         db.variable.insert(),
@@ -71,7 +89,21 @@ def test_open_dataarrays(conn, sample_generic):
         assert r.index[0] == 5
 
         # Correct path used in open_dataset
-        p.assert_called_once_with("/foo/foo.nc")
+        p.assert_any_call("/foo/foo-jan.nc")
 
         # Returned value is the 'temperature' from sample
         xarray.testing.assert_identical(r.iloc[0], sample["T"])
+
+
+def test_date_search(conn, sample_generic):
+    edb = ExperimentDB(conn=conn)
+
+    # Search with a left bound
+    files = edb.files(variable_id=5, time=slice("2010-02-10", None))
+    assert len(files) == 1
+    assert files.loc[5, "path"] == "/foo/foo-feb.nc"
+
+    # Search with a right bound
+    files = edb.files(variable_id=5, time=slice(None, "2010-01"))
+    assert len(files) == 1
+    assert files.loc[5, "path"] == "/foo/foo-jan.nc"

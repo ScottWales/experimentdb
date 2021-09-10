@@ -65,7 +65,9 @@ sqo.mapper(
             back_populates="experiment",
             collection_class=sqo.collections.attribute_mapped_collection("name"),
         ),
-        "files": sqo.relationship(File, back_populates="experiment"),
+        "files": sqo.relationship(
+            File, back_populates="experiment", order_by=file.c.relative_path
+        ),
     },
 )
 for c in all_subclasses(Experiment):

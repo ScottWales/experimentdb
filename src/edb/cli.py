@@ -125,14 +125,18 @@ class Files(CLIFunction):
     def setup_parser(self, parser):
         for k, v in search_params.items():
             parser.add_argument(f"--{k}", help=v["description"])
+        parser.add_argument("--from", help="Minimum file date")
+        parser.add_argument("--to", help="Maximum file date")
 
     def call(self, expdb, args):
         # search_params in args
         args = vars(args)
         args_params = args.keys() & search_params.keys()
 
+        time_range = slice(args["from"], args["to"])
+
         with pandas.option_context("display.max_colwidth", None):
-            print(expdb.files(**{k: args[k] for k in args_params}))
+            print(expdb.files(**{k: args[k] for k in args_params}, time=time_range))
 
 
 class ShowConfig(CLIFunction):
