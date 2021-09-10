@@ -22,6 +22,9 @@ def test_payu_find_files():
     assert "output414/ice/OUTPUT/iceh.1937-03.nc" in [f.relative_path for f in files]
 
 
+@pytest.mark.skipif(
+    not os.environ.get("HOSTNAME", "").endswith("nci.org.au"), reason="Only at NCI"
+)
 def test_payu_identify_streams():
     exp = Payu("/g/data3/hh5/tmp/cosima/access-om2-01/01deg_jra55v13_ryf8485_spinup6")
 

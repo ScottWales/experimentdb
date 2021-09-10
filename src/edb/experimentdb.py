@@ -191,7 +191,7 @@ class ExperimentDB:
         )
 
     @document_search_args
-    def files(self, /, **kwargs) -> pandas.DataFrame:
+    def files(self, /, time: slice = None, **kwargs) -> pandas.DataFrame:
         """
         List the files present in matching variables
 
@@ -217,6 +217,15 @@ class ExperimentDB:
 
         # Filter the search
         sel = search_filter(sel, **kwargs)
+
+        if time is not None:
+            t0 = pandas.to_datetime(time.start)
+            if t0 is not None:
+                sel = sel.where(db.file.c.end_date >= str(t0))
+
+            t1 = pandas.to_datetime(time.stop)
+            if t1 is not None:
+                sel = sel.where(db.file.c.start_date <= str(t1))
 
         df = pandas.read_sql(
             sel,
