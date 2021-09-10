@@ -6,6 +6,7 @@ import os
 import logging
 import netCDF4
 import xarray
+import cftime
 
 from .variable import Variable
 
@@ -72,8 +73,24 @@ class File:
 class NCFile(File):
     type = "netcdf"
 
-    def __init__(self, path: T.Union[str, pathlib.Path], exp: Experiment):
+    def __init__(
+        self,
+        path: T.Union[str, pathlib.Path],
+        exp: Experiment,
+    ):
         super().__init__(path, exp)
+
+        file = netCDF4.Dataset(os.path.join(exp.path, self.relative_path))
+        if "time" in file.variables:
+            time = file.variables["time"]
+            t0 = time[0]
+            t1 = time[-1]
+            units = time.units
+            calendar = time.calendar
+
+            self.start_date = str(cftime.num2date(t0, units=units, calendar=calendar))
+            self.end_date = str(cftime.num2date(t1, units=units, calendar=calendar))
+            print(self.start_date)
 
     def identify_variables(self) -> T.List[Variable]:
         """
