@@ -219,11 +219,11 @@ class ExperimentDB:
         sel = search_filter(sel, **kwargs)
 
         if time is not None:
-            t0 = pandas.to_datetime(time.start)
+            t0 = xarray.coding.cftime_offsets.to_cftime_datetime(time.start, calendar="366_day")
             if t0 is not None:
                 sel = sel.where(db.file.c.end_date >= str(t0))
 
-            t1 = pandas.to_datetime(time.stop)
+            t1 = xarray.coding.cftime_offsets.to_cftime_datetime(time.stop, calendar="366_day")
             if t1 is not None:
                 sel = sel.where(db.file.c.start_date <= str(t1))
 
